@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --background: #030712; /* gray-950 */
+  --foreground: #f3f4f6; /* gray-100 */
+  --card: #0b0f19; /* premium deep slate/blue-gray */
+  --card-hover: #111827; /* gray-900 */
+  --card-border: #1f2937; /* gray-800 */
+  --primary: #6366f1; /* indigo-500 */
+  --primary-glow: rgba(99, 102, 241, 0.15);
+  
+  --positive: #10b981; /* emerald-500 */
+  --positive-glow: rgba(16, 185, 129, 0.15);
+  --negative: #f43f5e; /* rose-500 */
+  --negative-glow: rgba(244, 63, 94, 0.15);
+  --neutral: #6b7280; /* gray-500 */
+  --neutral-glow: rgba(107, 114, 128, 0.15);
+  
+  --joy: #fbbf24; /* amber-400 */
+  --anger: #ef4444; /* red-500 */
+  --fear: #8b5cf6; /* violet-500 */
+  --sadness: #3b82f6; /* blue-500 */
+  --surprise: #ec4899; /* pink-500 */
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-card-border: var(--card-border);
+  
+  --color-primary: var(--primary);
+  --color-primary-glow: var(--primary-glow);
+  
+  --color-positive: var(--positive);
+  --color-positive-glow: var(--positive-glow);
+  --color-negative: var(--negative);
+  --color-negative-glow: var(--negative-glow);
+  --color-neutral: var(--neutral);
+  --color-neutral-glow: var(--neutral-glow);
+  
+  --color-joy: var(--joy);
+  --color-anger: var(--anger);
+  --color-fear: var(--fear);
+  --color-sadness: var(--sadness);
+  --color-surprise: var(--surprise);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+}
+
+/* Custom animations & utilities */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.animate-radar-pulse {
+  animation: radar-pulse 3s infinite ease-in-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
