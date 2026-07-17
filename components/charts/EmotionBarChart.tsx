@@ -9,13 +9,13 @@ interface EmotionBarChartProps {
 }
 
 const EMOTION_COLORS: Record<string, string> = {
-  Joy: "#fbbf24",      // amber-400
-  Anger: "#ef4444",    // red-500
-  Fear: "#8b5cf6",     // violet-500
-  Sadness: "#3b82f6",  // blue-500
-  Surprise: "#ec4899", // pink-500
-  Disgust: "#10b981",  // emerald-500
-  Neutral: "#6b7280"   // gray-500
+  Joy: "#006847",       // SentiScope Stitch emerald green
+  Anger: "#b90014",     // SentiScope Stitch brand red
+  Fear: "#e31b23",      // SentiScope Stitch primary container red
+  Sadness: "#565e74",   // SentiScope Stitch slate gray
+  Surprise: "#dae2fd",  // SentiScope Stitch secondary container
+  Disgust: "#00845a",   // SentiScope Stitch tertiary container
+  Neutral: "#bec6e0"    // SentiScope Stitch secondary fixed dim
 };
 
 interface TooltipPayloadItem {
@@ -31,11 +31,11 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
-    const color = EMOTION_COLORS[data.emotion] || "#6366f1";
+    const color = EMOTION_COLORS[data.emotion] || "#b90014";
     return (
-      <div className="rounded-xl border border-card-border bg-card p-3 shadow-md">
-        <p className="text-xs font-semibold text-gray-400">Emotion: {data.emotion}</p>
-        <p className="text-lg font-bold" style={{ color }}>
+      <div className="rounded-xl border border-card-border/10 bg-white/95 p-3 shadow-md">
+        <p className="text-xs font-semibold text-on-surface-variant">Emotion: {data.emotion}</p>
+        <p className="text-lg font-black" style={{ color }}>
           {data.percentage}%
         </p>
       </div>
@@ -54,19 +54,19 @@ export default function EmotionBarChart({ data }: EmotionBarChartProps) {
 
   if (!isMounted) {
     return (
-      <div className="flex h-64 w-full items-center justify-center bg-card rounded-2xl border border-card-border">
-        <div className="h-10 w-10 border-4 border-gray-800 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="flex h-64 w-full items-center justify-center bg-card rounded-2xl border border-card-border/10">
+        <div className="h-10 w-10 border-4 border-gray-200 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="rounded-2xl border border-card-border bg-card p-6 shadow-lg shadow-black/10 flex flex-col justify-between min-h-[340px]">
-        <h3 className="font-display text-lg font-bold tracking-wide text-white mb-4">
+      <div className="glass-card p-6 flex flex-col justify-between min-h-[300px]">
+        <h3 className="font-headline-md text-base font-extrabold text-on-surface mb-4">
           Emotion Analysis
         </h3>
-        <div className="flex flex-grow items-center justify-center text-sm text-gray-500 py-12">
+        <div className="flex flex-grow items-center justify-center text-xs text-on-surface-variant/60 font-semibold py-12">
           Emotion distribution unavailable.
         </div>
       </div>
@@ -74,37 +74,39 @@ export default function EmotionBarChart({ data }: EmotionBarChartProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-card-border bg-card p-6 shadow-lg shadow-black/10">
-      <h3 className="font-display text-lg font-bold tracking-wide text-white mb-4">
+    <div className="glass-card p-6">
+      <h3 className="font-headline-md text-base font-extrabold text-on-surface mb-4">
         Emotion Analysis
       </h3>
-      <div className="h-[260px] w-full">
+      <div className="h-[230px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.05)" vertical={false} />
             <XAxis
               dataKey="emotion"
-              stroke="#6b7280"
-              fontSize={12}
+              stroke="#565e74"
+              fontSize={11}
+              fontWeight="bold"
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="#6b7280"
-              fontSize={12}
+              stroke="#565e74"
+              fontSize={11}
+              fontWeight="bold"
               tickLine={false}
               axisLine={false}
               tickFormatter={(val) => `${val}%`}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(31, 41, 55, 0.4)", radius: 8 }} />
-            <Bar dataKey="percentage" radius={[8, 8, 0, 0]} maxBarSize={45}>
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0, 0, 0, 0.02)", radius: 8 }} />
+            <Bar dataKey="percentage" radius={[6, 6, 0, 0]} maxBarSize={36}>
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={EMOTION_COLORS[entry.emotion] || "#6366f1"}
+                  fill={EMOTION_COLORS[entry.emotion] || "#b90014"}
                 />
               ))}
             </Bar>

@@ -13,7 +13,9 @@ class SummaryService:
         top_topics: List[str],
         statistics: Any = None,
         alerts: Any = None,
-        posts: Any = None
+        posts: Any = None,
+        topic_intelligence: Any = None,
+        business_intelligence: Any = None
     ) -> str:
         """Generates a professional business executive summary using Gemini.
         
@@ -32,7 +34,6 @@ class SummaryService:
 
         posts_context = []
         if posts:
-            # Sort posts by score (likes) descending and include top 3 as context
             top_posts = sorted(posts, key=lambda p: getattr(p, "score", 0), reverse=True)[:3]
             posts_context = [
                 {
@@ -68,11 +69,60 @@ class SummaryService:
             "source": "Bluesky"
         }
 
+        # Format topic intelligence for LLM
+        topic_intel_payload = []
+        if topic_intelligence:
+            topic_intel_payload = [
+                {
+                    "topic": ti.topic,
+                    "mentions": ti.mentions,
+                    "averageSentiment": ti.average_sentiment,
+                    "dominantEmotion": ti.dominant_emotion,
+                    "averageConfidence": ti.average_confidence,
+                    "engagementScore": ti.engagement_score,
+                    "priority": ti.priority
+                }
+                for ti in topic_intelligence
+            ]
+
+        # Format business intelligence (insights & risk) for LLM (evidence posts excluded for brevity and safety)
+        bi_payload = {}
+        if business_intelligence:
+            insights_list = [
+                {
+                    "id": ins.id,
+                    "category": ins.category,
+                    "title": ins.title,
+                    "description": ins.description,
+                    "priority": ins.priority,
+                    "importanceScore": ins.importance_score,
+                    "confidence": ins.confidence,
+                    "supportingMetrics": [
+                        {"label": sm.label, "value": sm.value, "unit": sm.unit}
+                        for sm in ins.supporting_metrics
+                    ]
+                }
+                for ins in business_intelligence.insights
+            ]
+            ra = business_intelligence.risk_assessment
+            risk_dict = {
+                "riskLevel": ra.risk_level,
+                "riskScore": ra.risk_score,
+                "reason": ra.reason,
+                "supportingMetrics": ra.supporting_metrics
+            }
+            bi_payload = {
+                "insights": insights_list,
+                "riskAssessment": risk_dict
+            }
+
         gemini_payload = {
             "keyword": keyword,
             "statistics": stats_dict,
             "emotionDistribution": emo_dist,
             "topics": top_topics,
+            "topicIntelligence": topic_intel_payload,
+            "businessIntelligence": bi_payload,
             "alerts": alerts_list,
             "representativePosts": posts_context,
             "metadata": metadata_dict

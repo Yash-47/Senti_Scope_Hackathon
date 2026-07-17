@@ -13,7 +13,13 @@ from app.services.summary_service import summary_service
 from app.services.statistics_service import statistics_service
 from app.services.alert_service import alert_service
 from app.utils.response_builder import build_analyze_response
-from app.models.response_models import AnalyzeResponse, PostDetail
+from app.models.response_models import AnalyzeResponse, PostDetail, BusinessIntelligence
+
+from app.services.business_intelligence import (
+    topic_intelligence_service,
+    risk_service,
+    insight_service
+)
 
 class PipelineService:
     """Service to orchestrate SentiScope's entire data processing pipeline."""
@@ -33,6 +39,8 @@ class PipelineService:
                 cached=True,
                 statistics=cached_data["statistics"],
                 topics=cached_data["topics"],
+                topic_intelligence=cached_data.get("topic_intelligence", []),
+                business_intelligence=cached_data.get("business_intelligence"),
                 summary=cached_data["summary"],
                 alerts=cached_data["alerts"],
                 posts=cached_data["posts"]
@@ -87,17 +95,35 @@ class PipelineService:
         topics = await topic_service.extract(post_texts)
 
         # 6. Calculate statistics over analyzed metrics
-        # 6. Calculate statistics over analyzed metrics
         statistics = statistics_service.calculate_statistics(analyzed_posts)
 
-        # 8. Evaluate statistics to detect alerts
+        # 7. Evaluate statistics to detect alerts
         alerts = alert_service.evaluate_alerts(
             total_posts=statistics.total_posts,
             positive_percent=statistics.positive_percent,
             negative_percent=statistics.negative_percent
         )
 
-        # 7. Generate deterministic executive business summary
+        # 8. Topic Intelligence Calculation
+        topic_intel = topic_intelligence_service.generate_topic_intelligence(topics, posts_detail)
+
+        # 9. Risk Assessment & Business Insights
+        emo_dist = emotion_service.get_distribution()
+        risk_assessment = risk_service.calculate_risk(statistics, emo_dist)
+        insights = insight_service.generate_insights(
+            statistics=statistics,
+            emotion_distribution=emo_dist,
+            topic_intelligence=topic_intel,
+            alerts=alerts,
+            posts=posts_detail,
+            risk_assessment=risk_assessment
+        )
+        business_intelligence = BusinessIntelligence(
+            insights=insights,
+            risk_assessment=risk_assessment
+        )
+
+        # 10. Generate reporting summary (Gemini summarizes the deterministic BI findings)
         summary = await summary_service.generate_summary(
             keyword=keyword,
             positive_pct=statistics.positive_percent,
@@ -105,20 +131,24 @@ class PipelineService:
             top_topics=topics,
             statistics=statistics,
             alerts=alerts,
-            posts=posts_detail
+            posts=posts_detail,
+            topic_intelligence=topic_intel,
+            business_intelligence=business_intelligence
         )
 
-        # 9. Store the intermediate metrics in Cache for subsequent requests
+        # 11. Store the intermediate metrics in Cache for subsequent requests
         cache_data = {
             "statistics": statistics,
             "topics": topics,
+            "topic_intelligence": topic_intel,
+            "business_intelligence": business_intelligence,
             "summary": summary,
             "alerts": alerts,
             "posts": posts_detail
         }
         cache_service.set(keyword, cache_data)
 
-        # 10. Return final constructed response
+        # 12. Return final constructed response
         logger.info(f"Pipeline successfully completed for query: '{keyword}'")
         return build_analyze_response(
             request_id=request_id,
@@ -127,10 +157,11 @@ class PipelineService:
             cached=False,
             statistics=statistics,
             topics=topics,
+            topic_intelligence=topic_intel,
+            business_intelligence=business_intelligence,
             summary=summary,
             alerts=alerts,
             posts=posts_detail
         )
 
-# Reusable singleton instance
 pipeline_service = PipelineService()

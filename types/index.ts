@@ -67,6 +67,8 @@ export interface SentimentReport {
   sentimentDistribution: SentimentDataPoint[];
   emotionAnalysis: EmotionDataPoint[];
   trendingTopics: TrendingTopicPoint[];
+  topicIntelligence?: TopicIntelligence[];
+  businessIntelligence?: BusinessIntelligence;
   insights: AIInsights;
   alerts: BackendAlert[] | SocialMediaAlert[];
   rootCause: RootCauseAnalysis | null;
@@ -101,6 +103,8 @@ export interface BackendAlert {
   priority: string;
   title: string;
   description: string;
+  confidence: string;
+  evidence: BackendPostDetail[];
 }
 
 export interface BackendPostDetail {
@@ -116,10 +120,61 @@ export interface BackendPostDetail {
   postUrl: string;
 }
 
+export interface TopicIntelligence {
+  topic: string;
+  mentions: number;
+  averageSentiment: string;
+  dominantEmotion: string;
+  averageConfidence: number;
+  engagementScore: number;
+  priority: string;
+}
+
+export interface SupportingMetric {
+  label: string;
+  value: any;
+  unit?: string;
+}
+
+export interface EvidencePost {
+  author: string;
+  text: string;
+  url: string;
+  sentiment: string;
+  emotion: string;
+  confidence: number;
+}
+
+export interface BackendInsight {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  priority: string;
+  importanceScore: number;
+  confidence: string;
+  supportingMetrics: SupportingMetric[];
+  evidence: EvidencePost[];
+}
+
+export interface RiskAssessment {
+  riskLevel: string;
+  riskScore: number;
+  reason: string;
+  supportingMetrics: Record<string, any>;
+}
+
+export interface BusinessIntelligence {
+  insights: BackendInsight[];
+  riskAssessment: RiskAssessment;
+}
+
 export interface BackendAnalyzeResponse {
   metadata: ResponseMetadata;
   statistics: BackendStatistics;
   topics: string[];
+  topicIntelligence: TopicIntelligence[];
+  businessIntelligence: BusinessIntelligence;
   summary: string;
   alerts: BackendAlert[];
   posts: BackendPostDetail[];

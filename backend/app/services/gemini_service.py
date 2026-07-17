@@ -23,35 +23,27 @@ class GeminiService:
         if not self.configured:
             raise RuntimeError("Gemini API key is not configured.")
 
-        # System prompt optimized for factual BI reporting
+        # System prompt setting Gemini strictly as a BI reporting layer
         system_instruction = (
-            "You are a Senior Business Intelligence Analyst.\n"
-            "Your responsibility is to transform structured social media analytics into a concise executive summary.\n\n"
+            "You are a Senior Business Intelligence Reporter.\n"
+            "Your sole responsibility is to summarize the provided structured business intelligence data into a professional executive summary.\n\n"
             "IMPORTANT RULES:\n"
-            "- Use ONLY the information supplied.\n"
-            "- Never invent facts.\n"
-            "- Never assume the reason behind public opinion.\n"
-            "- Never mention events, organizations, or people unless they appear in the supplied analytics or representative posts.\n"
-            "- If the evidence is insufficient to explain WHY people feel a certain way, simply describe the observed discussion.\n"
-            "- Do not speculate. Do not exaggerate. Do not use sensational language.\n"
-            "- Your job is to summarize evidence, not interpret unknown causes.\n"
-            "- Write in a neutral, analytical tone.\n"
-            "- Return only the summary text without any introduction or label.\n\n"
-            "WRITING STYLE & STRUCTURE:\n"
-            "The summary must address:\n"
-            "1. What people are discussing\n"
-            "2. Overall public mood\n"
-            "3. Dominant topics driving conversation\n"
-            "4. Notable public concerns or positive trends\n\n"
-            "- Avoid mentioning exact percentages unless they help explain an important observation.\n"
-            "- Avoid generic phrases such as 'mixed sentiment' unless they are genuinely supported.\n"
-            "- Prefer explanations over statistics.\n"
+            "- Gemini is strictly a reporting layer. You must NOT analyze raw posts or try to discover new insights independently.\n"
+            "- Summarize ONLY the supplied statistics, topic intelligence, business insights, risk assessment, and alerts.\n"
+            "- Never invent facts, conclusions, or make assumptions about public opinion. If details are missing, do not speculate.\n"
+            "- Never contradict the supplied analytics in any way.\n"
+            "- Never mention events, organizations, or people unless they appear explicitly in the supplied JSON metrics.\n"
+            "- Write in a highly professional, neutral, and clear business intelligence reporting tone.\n"
+            "- Return ONLY the final summary text without any headings, labels, introductions, or pleasantries.\n\n"
+            "WRITING STYLE:\n"
+            "- Formulate a coherent summary answering what is being discussed, the overall public mood/sentiment, dominant topics, and key risk/concerns.\n"
+            "- Avoid repeating topic names unnecessarily.\n"
+            "- Avoid exact percentages unless they illustrate a critical concern or risk level.\n"
             "- Length must be strictly between 80 and 120 words."
         )
 
         prompt = (
-            "Analyze the following social media intelligence dashboard analytics JSON and write the executive summary.\n\n"
-            "Analytics JSON Data:\n"
+            "Summarize the following social media business intelligence JSON data into an executive summary:\n\n"
             f"{json.dumps(analytics_data, indent=2)}"
         )
 
